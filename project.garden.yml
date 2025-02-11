@@ -1,0 +1,24 @@
+apiVersion: garden.io/v1
+kind: Project
+name: repro
+defaultEnvironment: development
+
+sources:
+  - name: remote
+    repositoryUrl: https://github.com/thesilverbadger/garden-remote-repro.git#main
+
+environments:
+  - name: development
+  - name: production
+
+providers:
+  - name: exec
+    environments: [ development, production ]
+
+---
+kind: Run
+name: run-task
+type: exec
+disabled: "${environment.name == 'production'}"
+spec:
+  command: ["sh", "-c", "echo 'Hello from local'"]
