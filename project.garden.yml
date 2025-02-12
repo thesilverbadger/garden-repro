@@ -3,10 +3,6 @@ kind: Project
 name: repro
 defaultEnvironment: development
 
-sources:
-  - name: remote
-    repositoryUrl: https://github.com/thesilverbadger/garden-remote-repro.git#main
-
 environments:
   - name: development
   - name: production
@@ -21,6 +17,25 @@ providers:
 kind: Run
 name: run-task
 type: exec
-disabled: "${environment.name == 'production'}"
+environments:
+  - production
+  - development
+#dependencies:
+  #$if: ${environment.name == 'production'}
+  #$then:
+    #- deploy.tf-production
 spec:
-  command: ["sh", "-c", "echo 'Hello from local'"]
+  $if: ${environment.name != 'production'}
+  $then:
+    command: ["sh", "-c", "echo 'Hello from garden-remote in development'"]
+  $else:
+    command: ["sh", "-c", "echo '${runtime.services.tf-production.outputs.welcome_message}'"]
+
+---
+kind: Deploy
+type: terraform
+name: tf-production
+environments:
+  - production
+spec:
+  root: .

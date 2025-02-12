@@ -1,2 +1,4 @@
 /.garden
 .DS_Store
+*.hcl
+/.terraform
